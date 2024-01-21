@@ -12,6 +12,11 @@
 <body>
     <div class="container-fluid">
         <div class="row">
+            <div class="col-6 mx-auto d-flex justify-content-center mt-3">
+                <video id="videoElement"  width="500px" height="300px" class="rounded" controls autoplay></video>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-6 mx-auto">
                 <h2 class="my-3">Program</h2>
                 <% if (data) { %>
@@ -23,7 +28,7 @@
                                         <img src="<%= data.items[i].image %>" class="img-thumbnail border-0 "
                                             width="45" />
                                         <%= data.items[i].title %>
-                                 
+
                                     </div>
                                     <div class="d-flex">
                                         <p class="fw-medium">
@@ -35,7 +40,7 @@
                                         </p>
                                     </div>
                                 </div>
-                               
+
                             </li>
                             <% } %>
                     </ul>
@@ -47,5 +52,17 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
     crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script>
+    if (Hls.isSupported()) {
+        var videoElement = document.getElementById('videoElement');
+        var hls = new Hls();
+        hls.loadSource('https://webcam.mosaiquefm.net:1936/mosatv/studio/playlist.m3u8');
+        hls.attachMedia(videoElement);
+    } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+        // For Safari
+        videoElement.src = 'https://webcam.mosaiquefm.net:1936/mosatv/studio/playlist.m3u8';
+    }
+</script>
 
 </html>
