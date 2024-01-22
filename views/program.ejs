@@ -68,61 +68,36 @@
 
 
     let recordButton = document.getElementById('recordButton');
-    let recording = false;
     let recordRequest = null;
 
     recordButton.addEventListener('click', () => {
-        if (!recording) {
-            startRecording();
-        } else {
-            stopRecording();
-        }
+        startRecording();
     });
 
 
     function startRecording() {
-        recording = true;
-        recordButton.innerText = 'Stop Recording';
+        const durationValue = 30;
         recordRequest = new XMLHttpRequest();
-        recordRequest.open('GET', '/channel/record');
+        recordRequest.open('GET', `/channel/record?duration=${durationValue}`);
         recordRequest.onreadystatechange = function () {
             if (recordRequest.readyState === 4) {
-                if (recordRequest.status === 200) {
-                    console.log('Recording started.');
-                } else {
-                    console.error('Failed to start recording.');
-                    recording = false;
-                    recordButton.innerText = 'Start Recording';
-                }
-            }
+                console.log('Recording started.');
+                let countdown = durationValue;
+                const intervalId = setInterval(() => {
+                    recordButton.innerText = `Recording will stop in ${countdown} seconds`;
+                    countdown--;
+                    if (countdown < 0) {
+                        clearInterval(intervalId);
+                        recordButton.innerText = 'Start Recording';
+                    }
+                }, 1000);
+            } 
         };
+
         recordRequest.send();
     }
 
-    function stopRecording() {
-        recording = false;
-        recordButton.innerText = 'Start Recording';
-        recordRequest = new XMLHttpRequest();
-        recordRequest.open('GET', '/channel/record/stop');
-        recordRequest.onreadystatechange = function () {
-            if (recordRequest.readyState === 4) {
-                if (recordRequest.status === 200) {
-                    console.log('Recording finished.');
-                } else {
-                    console.error('Failed to finish recording.');
-                    recording = true;
-                    recordButton.innerText = 'Stop Recording';
-                }
-            }
-        }
-        recordRequest.send();
-    }
 
-    window.addEventListener('beforeunload', function () {
-        if (recording) {
-            stopRecording();
-        }
-    })
 </script>
 
 </html>
