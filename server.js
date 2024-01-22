@@ -3,7 +3,6 @@ const app = require('./app');
 const server = http.createServer(app);
 const cors = require('cors');
 app.use(cors());
-
 app.set('view engine', 'ejs');
 
 const normalizePort = val => {

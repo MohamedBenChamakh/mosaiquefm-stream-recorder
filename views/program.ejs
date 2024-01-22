@@ -10,10 +10,13 @@
 </head>
 
 <body>
-    <div class="container-fluid">
+    <div class="container-fluid p-5">
         <div class="row">
-            <div class="col-6 mx-auto d-flex justify-content-center mt-3">
-                <video id="videoElement"  width="500px" height="300px" class="rounded" controls autoplay></video>
+            <div class="col-6 mx-auto d-flex flex-column align-items-center  mt-3">
+                <video id="videoElement" width="500px" height="300px" class="rounded " controls autoplay></video>
+                <div class="my-2">
+                    <button id="recordButton" class="btn btn-sm btn-success ">Start Recording</button>
+                </div>
             </div>
         </div>
         <div class="row">
@@ -60,9 +63,66 @@
         hls.loadSource('https://webcam.mosaiquefm.net:1936/mosatv/studio/playlist.m3u8');
         hls.attachMedia(videoElement);
     } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
-        // For Safari
         videoElement.src = 'https://webcam.mosaiquefm.net:1936/mosatv/studio/playlist.m3u8';
     }
+
+
+    let recordButton = document.getElementById('recordButton');
+    let recording = false;
+    let recordRequest = null;
+
+    recordButton.addEventListener('click', () => {
+        if (!recording) {
+            startRecording();
+        } else {
+            stopRecording();
+        }
+    });
+
+
+    function startRecording() {
+        recording = true;
+        recordButton.innerText = 'Stop Recording';
+        recordRequest = new XMLHttpRequest();
+        recordRequest.open('GET', '/channel/record');
+        recordRequest.onreadystatechange = function () {
+            if (recordRequest.readyState === 4) {
+                if (recordRequest.status === 200) {
+                    console.log('Recording started.');
+                } else {
+                    console.error('Failed to start recording.');
+                    recording = false;
+                    recordButton.innerText = 'Start Recording';
+                }
+            }
+        };
+        recordRequest.send();
+    }
+
+    function stopRecording() {
+        recording = false;
+        recordButton.innerText = 'Start Recording';
+        recordRequest = new XMLHttpRequest();
+        recordRequest.open('GET', '/channel/record/stop');
+        recordRequest.onreadystatechange = function () {
+            if (recordRequest.readyState === 4) {
+                if (recordRequest.status === 200) {
+                    console.log('Recording finished.');
+                } else {
+                    console.error('Failed to finish recording.');
+                    recording = true;
+                    recordButton.innerText = 'Stop Recording';
+                }
+            }
+        }
+        recordRequest.send();
+    }
+
+    window.addEventListener('beforeunload', function () {
+        if (recording) {
+            stopRecording();
+        }
+    })
 </script>
 
 </html>
