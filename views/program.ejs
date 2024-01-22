@@ -9,7 +9,7 @@
     <title>Channel</title>
 </head>
 
-<body>
+<body data-bs-theme="dark">
     <div class="container-fluid p-5">
         <div class="row">
             <div class="col-6 mx-auto d-flex flex-column align-items-center  mt-3">
@@ -76,7 +76,7 @@
 
 
     function startRecording() {
-        const durationValue = 30;
+        const durationValue = 60;
         recordRequest = new XMLHttpRequest();
         recordRequest.open('GET', `/channel/record?duration=${durationValue}`);
         recordRequest.onreadystatechange = function () {

@@ -63,13 +63,30 @@ function getReplay(req, res) {
             /\.(jpg|jpeg|png|gif)$/i.test(path.extname(file))
         );
 
-        const imageUrls = imageFiles.map(file =>
-            `${req.protocol}://${req.get('host')}/thumbnails/${file}`
+        const data = imageFiles.map(file => {
+            return {
+                'thumbnail': `${req.protocol}://${req.get('host')}/thumbnails/${file}`,
+                'video': `${req.protocol}://${req.get('host')}/videos/${getVideoFilename(file)}`
+            }
+        }
+
         );
-        res.json({ images: imageUrls });
+        res.render('replay', { success: true, data: data, });
     });
 }
 
+
+function getVideoFilename(thumbnailFilename) {
+    // Assuming the thumbnail filename format is "videofilename_thumbnail.jpg"
+    const parts = thumbnailFilename.split('_thumbnail.');
+    if (parts.length === 2) {
+        return parts[0]+".mp4"; // Return the video filename
+    } else {
+        // Handle unexpected filename format
+        console.error('Unexpected thumbnail filename format:', thumbnailFilename);
+        return thumbnailFilename; // Return the original filename as a fallback
+    }
+}
 
 function generateThumbnail(src, filename) {
     ffmpeg(src).screenshots({
